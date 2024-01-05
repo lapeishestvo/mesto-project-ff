@@ -20,7 +20,7 @@ function createCard(card) {
   cardElement.querySelector('.card__image').alt = `Фотография с видами региона ${card.name}`;
   cardElement.querySelector('.card__delete-button').addEventListener('click', deleteCard);
 
-  cardsContainer.append(cardElement);
+  return cardElement;
 }
 
 function deleteCard(evt) {
@@ -28,5 +28,5 @@ function deleteCard(evt) {
 }
 
 initialCards.forEach(function (card) {
-  createCard(card, deleteCard);
+  cardsContainer.append(createCard(card, deleteCard));
 })
