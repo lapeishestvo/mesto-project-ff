@@ -1,25 +1,54 @@
 import { createCard } from './card';
 
-export function closePopup(evt) {
-  const popups = document.querySelectorAll('.popup');
+export function openPopup(popup) {
+  popup.classList.remove('popup_is-animated');
+  popup.classList.add('popup_is-opened');
 
-  popups.forEach(function(popup) {
-    popup.classList.remove('popup_is-opened');
-    popup.classList.add('popup_is-animated');
-  });
+  popup.addEventListener('click', closePopupByOverlay)
+
+  /* popup.addEventListener('click', closePopupOnClick);
+  popup.querySelector('.popup__content').addEventListener('click', stopPropagation); */
+
+  popup.querySelector('.popup__close').addEventListener('click', closePopupOnCloseButton);
+
+  document.addEventListener('keydown', closePopupOnEscape);
+
+  function closePopupByOverlay(evt) {
+    if (evt.target.classList.contains('popup')) {
+       closePopup(evt.target)
+    }
 }
 
-export function handleProfileFormSubmit(evt) {
-  evt.preventDefault();
-  document.querySelector('.profile__title').textContent = document.querySelector('.popup__input_type_name').value;
-  document.querySelector('.profile__description').textContent = document.querySelector('.popup__input_type_description').value;
-  closePopup();
-};
+  function closePopupOnCloseButton() {
+    closePopup(popup);
+  }
 
-export function handleNewPlaceFormSubmit(evt) {
-  evt.preventDefault();
-  document.querySelector('.places__list').prepend(createCard(document.querySelector('.popup__input_type_card-name').value, document.querySelector('.popup__input_type_url').value));
-  document.querySelector('.popup__input_type_card-name').value = '';
-  document.querySelector('.popup__input_type_url').value = '';
-  closePopup();
-};
+  function stopPropagation(evt) {
+    evt.stopPropagation();
+  }
+
+  function closePopupOnEscape(evt) {
+    if (evt.key === 'Escape') {
+      closePopup(popup);
+    }
+  }
+
+  popup._closePopupByOverlay = closePopupByOverlay;
+  popup._closePopupOnCloseButton = closePopupOnCloseButton;
+  popup._stopPropagation = stopPropagation;
+  popup._closePopupOnEscape = closePopupOnEscape;
+}
+
+export function closePopup(popup) {
+  popup.classList.remove('popup_is-opened');
+  popup.classList.add('popup_is-animated');
+
+  popup.removeEventListener('click', popup._closePopupOnClick);
+  popup.querySelector('.popup__content').removeEventListener('click', popup._stopPropagation);
+  document.removeEventListener('keydown', popup._closePopupOnEscape);
+
+  delete popup._closePopupOnClick;
+  delete popup._stopPropagation;
+  delete popup._closePopupOnEscape;
+  delete popup._closePopupByOverlay;
+}

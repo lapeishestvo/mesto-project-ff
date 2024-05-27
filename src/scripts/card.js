@@ -1,4 +1,4 @@
-export function createCard(name, link) {
+export function createCard(name, link, deleteCard, likeCard, openPhoto) {
   const cardTemplate = document.querySelector('#card-template').content;
   const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
 
@@ -20,11 +20,3 @@ export function likeCard (evt) {
   evt.target.classList.toggle('card__like-button_is-active')
 }
 
-export function openPhoto (evt) {
-  const currentCard = evt.target.closest('.places__item');
-
-  document.querySelector('.popup_type_image').classList.add('popup_is-opened');
-  document.querySelector('.popup__image').src = evt.target.src;
-  document.querySelector('.popup__image').alt = evt.target.alt;
-  document.querySelector('.popup__caption').textContent = currentCard.querySelector('.card__title').textContent;
-}
