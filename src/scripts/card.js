@@ -30,10 +30,8 @@ export function createCard(name, link, likes, deleteCard, likeCard, openPhoto, u
 }
 
 export function deleteCard(cardId, evt) {
-  console.log(evt);
-    evt.target.closest('.places__item').remove();
-    console.log(evt.target);
-    deleteCardFromServer(cardId);
+  deleteCardFromServer(cardId);
+  evt.target.closest('.places__item').remove();
 }
 
 export function likeCard(cardId, evt) {

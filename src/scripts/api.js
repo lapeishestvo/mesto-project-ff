@@ -5,24 +5,50 @@ const config = {
       'Content-Type': 'application/json'
     }
   }
+
+function getResponseData(res) {
+    console.log(res)
+    if (!res.ok) {
+        return Promise.reject(`Ошибка: ${res.status}`); 
+    }
+    return res.json();
+}
   
 export function getInitialCards() {
     return fetch(`${config.baseUrl}/cards`, {
-    headers: {
-      authorization: config.headers.authorization,
-      'Content-Type': config.headers['Content-Type']
-  }
-})
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
+        headers: {
+            authorization: config.headers.authorization,
+            'Content-Type': config.headers['Content-Type']
+        }
+    })
+    .then(res => getResponseData(res))
     .catch((err) => {
         console.log(err);
-      });  
-  }
+    });
+}
+
+export function getUserInfo() {
+    return fetch(`${config.baseUrl}/users/me `, {
+        headers: {
+            authorization: config.headers.authorization,
+            'Content-Type': config.headers['Content-Type']
+        }
+    })
+    .then(res => getResponseData(res))
+    .catch((err) => {
+        console.log(err);
+    });
+}
+
+export function getAllData() {
+    return Promise.all([getInitialCards(), getUserInfo()])
+    .then(([cards, userInfo]) => {
+        return { cards, userInfo };
+    })
+        .catch((err) => {
+        console.log('Error in Promise.all:', err);
+    });
+}
 
   export function addNewPlace(name, link) {  
     return fetch(`${config.baseUrl}/cards`, {
@@ -36,12 +62,7 @@ export function getInitialCards() {
             link: link
         })
     })
-    .then(res => {
-        if (res.ok) {
-          return res.json();
-        }
-        return Promise.reject(`Ошибка: ${res.status}`);
-      })
+    .then(res => getResponseData(res))
         .catch((err) => {
             console.log(err);
           });  
@@ -65,12 +86,7 @@ export function giveLike(id) {
         'Content-Type': config.headers['Content-Type']
         }
     })
-        .then(res => {
-            if (res.ok) {
-              return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-          })
+        .then(res => getResponseData(res))
             .catch((err) => {
                 console.log(err);
               }); 
@@ -85,35 +101,12 @@ export function deleteLike(id) {
         'Content-Type': config.headers['Content-Type'],
         }
     })
-        .then(res => {
-            if (res.ok) {
-              return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-          })
+        .then(res => getResponseData(res))
             .catch((err) => {
                 console.log(err);
               }); 
      
 }
-
-export function getUserInfo() {
-    return fetch(`${config.baseUrl}/users/me `, {
-    headers: {
-      authorization: config.headers.authorization,
-      'Content-Type': config.headers['Content-Type']
-    }
-  })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-    .catch((err) => {
-        console.log(err);
-      });  
-  }
 
 export function updateUserInfo(name, description) {  
     return fetch(`${config.baseUrl}/users/me `, {
@@ -126,44 +119,24 @@ export function updateUserInfo(name, description) {
             name: name,
             about: description
         })
-    }).then(res => {
-        if (res.ok) {
-          return res.json();
-        }
-        return Promise.reject(`Ошибка: ${res.status}`);
-      })
+    }).then(res => getResponseData(res))
         .catch((err) => {
             console.log(err);
           });  
       }
 
-export function updateAvatar(avatar) {  
-    return fetch(`${config.baseUrl}/users/me/avatar`, {
-        method: 'PATCH',
-        headers: {
-        authorization: config.headers.authorization,
-        'Content-Type': config.headers['Content-Type']
-        },
-        body: JSON.stringify({
-            avatar: avatar
+      export function updateAvatar(avatar) {  
+        return fetch(`${config.baseUrl}/users/me/avatar`, {
+            method: 'PATCH',
+            headers: {
+                authorization: config.headers.authorization,
+                'Content-Type': config.headers['Content-Type']
+                },
+            body: JSON.stringify({ avatar })
         })
-    }).then(res => {
-        if (res.ok) {
-          return res.json();
-        }
-        return Promise.reject(`Ошибка: ${res.status}`);
-      })
-        .catch((err) => {
-            console.log(err);
-          });  
-      }
-  
-export function getAllData() {
-    return Promise.all([getInitialCards(), getUserInfo()])
-        .then(([cards, userInfo]) => {
-            return { cards, userInfo };
-        })
-        .catch((err) => {
-            console.log('Error in Promise.all:', err);
+        .then(getResponseData)
+        .catch(err => {
+            console.error('Error updating avatar:', err);
         });
-}
+    }
+  
